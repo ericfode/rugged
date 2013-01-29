@@ -23,6 +23,32 @@ module Rugged
     end
   end
 
+  class SandboxedTestCase < TestCase
+    def setup
+      super
+      @_sandbox_path = Dir.mktmpdir("rugged_sandbox")
+    end
+
+    def teardown
+      #FileUtils.remove_entry_secure @_sandbox_path
+      super
+    end
+
+    # Fills the current sandbox folder with the files
+    # found in the given repository
+    def sandbox_init(repository)
+      FileUtils.cp_r(File.join(TestCase::TEST_DIR, 'fixtures', repository, "."), @_sandbox_path)
+
+      Dir.chdir(@_sandbox_path) do
+        File.rename(".gitted", ".git") if File.exists?(".gitted")
+        File.rename("gitattributes", ".gitattributes") if File.exists?("gitattributes")
+        File.rename("gitignore", ".gitignore") if File.exists?("gitignore")
+      end
+
+      Rugged::Repository.new(@_sandbox_path)
+    end
+  end
+
   module RepositoryAccess
     def setup
       @path = File.dirname(__FILE__) + '/fixtures/testrepo.git/'
