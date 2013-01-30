@@ -30,7 +30,7 @@ module Rugged
     end
 
     def teardown
-      #FileUtils.remove_entry_secure @_sandbox_path
+      FileUtils.remove_entry_secure @_sandbox_path
       super
     end
 
