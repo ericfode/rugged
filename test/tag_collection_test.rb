@@ -34,6 +34,17 @@ class TagCollectionTest < Rugged::SandboxedTestCase
     ]
   end
 
+  def test_each_with_pattern
+    tags = []
+    
+    @tags.each("foo/*") do |tag|
+      tag.is_a?(Rugged::TagReference)
+      tags << tag.canonical_name
+    end
+
+    assert_equal tags, ["refs/tags/foo/bar", "refs/tags/foo/foo/bar"]
+  end
+
   def test_delete_with_short_name
     @tags.delete("test")
 

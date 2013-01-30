@@ -13,8 +13,8 @@ module Rugged
       Rugged::TagReference.new(@repo, ref, name)
     end
 
-    def each
-      Rugged::Tag.each(@repo) do |name|
+    def each(pattern = '')
+      Rugged::Tag.each(@repo, pattern) do |name|
         if tag = self[name]
           yield tag
         end
