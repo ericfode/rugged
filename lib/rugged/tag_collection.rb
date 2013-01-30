@@ -8,9 +8,7 @@ module Rugged
 
     # Returns the tag with the specified name
     def [](name)
-      name = canonical_name(name)
-      return unless ref = Rugged::Reference.lookup(@repo, name)
-      Rugged::TagReference.new(@repo, ref, name)
+      Rugged::TagReference.find(@repo, name)
     end
 
     # Public: Iterate over a repo's tags.
@@ -42,44 +40,41 @@ module Rugged
 
     def delete(tag_or_name)
       if tag_or_name.kind_of?(Rugged::TagReference)
-        name = short_name(tag_or_name.canonical_name)
+        name = Rugged::TagReference.short_name(tag_or_name.canonical_name)
       else
-        name = short_name(tag_or_name)
+        name = Rugged::TagReference.short_name(tag_or_name)
       end
 
       Rugged::Tag.delete(@repo, name)
-    end
-
-    protected
-
-    def short_name(name)
-      name.sub(%r{^refs/tags/}, "")
-    end
-
-    def canonical_name(name)
-      !name.start_with?("refs/tags/") ? "refs/tags/#{name}" : name
     end
   end
 end
 
 module Rugged
-  class TagReference
-    attr_reader :canonical_name
-    attr_reader :repository
+  class TagReference < Rugged::Reference
+    def self.find(repo, name)
+      lookup(repo, canonical_name(name))
+    end
 
-    def initialize(repo, reference, canonical_name)
-      @repo = repo
-      @reference = reference
-      @canonical_name = canonical_name
+    def self.short_name(name)
+      name.sub(%r{^refs/tags/}, "")
+    end
+
+    def self.canonical_name(name)
+      !name.start_with?("refs/tags/") ? "refs/tags/#{name}" : name
+    end
+
+    def canonical_name
+      self.name
     end
 
     def ==(other)
       other.kind_of?(Rugged::TagReference) &&
-        @canonical_name == other.canonical_name
+        self.canonical_name == other.canonical_name
     end
 
     def annotation
-      object = Rugged::Object.lookup(@repo, @reference.target)
+      object = Rugged::Object.lookup(@owner, self.target_object)
       object.kind_of?(Rugged::Tag) ? object : nil
     end
 
@@ -87,8 +82,10 @@ module Rugged
       !!annotation
     end
 
+    alias_method 'target_object', 'target'
+
     def target
-      object = Rugged::Object.lookup(@repo, @reference.target)
+      object = Rugged::Object.lookup(@owner, self.target_object)
       object.kind_of?(Rugged::Tag) ? object.target : object
     end
   end
