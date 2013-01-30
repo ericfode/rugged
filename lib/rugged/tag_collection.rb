@@ -13,6 +13,18 @@ module Rugged
       Rugged::TagReference.new(@repo, ref, name)
     end
 
+    # Public: Iterate over a repo's tags.
+    #
+    # Yields a Rugged::TagReference for each tag that is found in
+    # the associated repository. 
+    #
+    # Examples
+    #
+    #   each { |tag| puts tag.canonical_name }
+    #
+    #   each("v1.*").count
+    #
+    # Returns an Enumerator if no block was given, or nothing.
     def each(pattern = '')
       return enum_for(:each, pattern) unless block_given?
 
