@@ -94,7 +94,7 @@ class RepositoryTest < Rugged::TestCase
   end
 
   def test_return_matching_tags
-    tags = @repo.tags 'v0.9'
+    tags = @repo.tags.each('v0.9')
     assert_equal 1, tags.count
   end
 
