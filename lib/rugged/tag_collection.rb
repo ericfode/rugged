@@ -14,6 +14,8 @@ module Rugged
     end
 
     def each(pattern = '')
+      return enum_for(:each, pattern) unless block_given?
+
       Rugged::Tag.each(@repo, pattern) do |name|
         if tag = self[name]
           yield tag
