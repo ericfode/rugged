@@ -33,6 +33,34 @@ class TagCollectionTest < Rugged::SandboxedTestCase
       "refs/tags/test"
     ]
   end
+
+  def test_delete_with_short_name
+    @tags.delete("test")
+
+    assert_nil @tags.find { |tag| tag.canonical_name == "refs/tags/test" }
+  end
+
+  def test_delete_with_canonical_name
+    @tags.delete("refs/tags/test")
+
+    assert_nil @tags.find { |tag| tag.canonical_name == "refs/tags/test" }
+  end
+
+  def test_delete_raises_error_with_nonexistant_name
+    assert_raises Rugged::ReferenceError do
+      @tags.delete("this-does-not-exist")
+    end
+
+    assert_raises Rugged::ReferenceError do
+      @tags.delete("refs/tags/this-does-not-exist")
+    end
+  end
+
+  def test_delete_with_tag
+    @tags.delete(@tags["test"])
+
+    assert_nil @tags.find { |tag| tag.canonical_name == "refs/tags/test" }
+  end
 end
 
 

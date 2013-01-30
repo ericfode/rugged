@@ -8,7 +8,7 @@ module Rugged
 
     # Returns the tag with the specified name
     def [](name)
-      name = "refs/tags/#{name}" unless name.start_with?("refs/tags/")
+      name = canonical_name(name)
       return unless ref = Rugged::Reference.lookup(@repo, name)
       Rugged::TagReference.new(@repo, ref, name)
     end
@@ -26,11 +26,24 @@ module Rugged
       self[name]
     end
 
-    def delete(*tags_or_names)
-      tags_or_names.each do |tag_or_name|
-        tag_or_name = tag_or_name.name if tag_or_name.kind_of?(Rugged::Tag)
-        Ruggged::Tag.delete(@repo, tag_or_name)
+    def delete(tag_or_name)
+      if tag_or_name.kind_of?(Rugged::TagReference)
+        name = short_name(tag_or_name.canonical_name)
+      else
+        name = short_name(tag_or_name)
       end
+
+      Rugged::Tag.delete(@repo, name)
+    end
+
+    protected
+
+    def short_name(name)
+      name.sub(%r{^refs/tags/}, "")
+    end
+
+    def canonical_name(name)
+      !name.start_with?("refs/tags/") ? "refs/tags/#{name}" : name
     end
   end
 end
@@ -38,6 +51,7 @@ end
 module Rugged
   class TagReference
     attr_reader :canonical_name
+    attr_reader :repository
 
     def initialize(repo, reference, canonical_name)
       @repo = repo
