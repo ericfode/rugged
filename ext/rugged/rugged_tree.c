@@ -109,7 +109,7 @@ static VALUE rb_git_tree_get_entry(VALUE self, VALUE entry_id)
 	Data_Get_Struct(self, git_tree, tree);
 
 	if (TYPE(entry_id) == T_FIXNUM)
-		return rb_git_treeentry_fromC(git_tree_entry_byindex(tree, FIX2INT(entry_id)));
+		return rb_git_treeentry_fromC(git_tree_entry_byindex(tree, (size_t)FIX2INT(entry_id)));
 
 	else if (TYPE(entry_id) == T_STRING)
 		return rb_git_treeentry_fromC(git_tree_entry_byname(tree, StringValueCStr(entry_id)));
@@ -217,7 +217,8 @@ static int rugged__treewalk_cb(const char *root, const git_tree_entry *entry, vo
 static VALUE rb_git_tree_walk(VALUE self, VALUE rb_mode)
 {
 	git_tree *tree;
-	int error, mode = 0;
+	git_treewalk_mode mode = 0;
+	int error;
 	ID id_mode;
 
 	Data_Get_Struct(self, git_tree, tree);
@@ -333,7 +334,7 @@ static VALUE rb_git_treebuilder_insert(VALUE self, VALUE rb_entry)
 		builder,
 		StringValueCStr(rb_path),
 		&oid,
-		FIX2INT(rb_attr));
+		(git_filemode_t)FIX2INT(rb_attr));
 
 	rugged_exception_check(error);
 	return Qnil;

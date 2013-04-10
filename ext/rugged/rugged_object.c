@@ -206,7 +206,7 @@ VALUE rb_git_object_lookup(VALUE klass, VALUE rb_repo, VALUE rb_hex)
 	git_otype type;
 	git_oid oid;
 	int error;
-	int oid_length;
+	size_t oid_length;
 
 	git_repository *repo;
 
@@ -216,7 +216,7 @@ VALUE rb_git_object_lookup(VALUE klass, VALUE rb_repo, VALUE rb_hex)
 		type = GIT_OBJ_ANY;
 
 	Check_Type(rb_hex, T_STRING);
-	oid_length = (int)RSTRING_LEN(rb_hex);
+	oid_length = (size_t)RSTRING_LEN(rb_hex);
 
 	rugged_check_repo(rb_repo);
 

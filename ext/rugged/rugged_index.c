@@ -134,7 +134,7 @@ static VALUE rb_git_index_get(int argc, VALUE *argv, VALUE self)
 				"Too many arguments when trying to lookup entry by index");
 		}
 
-		entry = git_index_get_byindex(index, FIX2INT(rb_entry));
+		entry = git_index_get_byindex(index, FIX2UINT(rb_entry));
 	} else {
 		rb_raise(rb_eArgError,
 			"Invalid type for `entry`: expected String or Fixnum");
@@ -256,7 +256,7 @@ default_entry_value(VALUE rb_entry, const char *key)
 		return 0;
 
 	Check_Type(val, T_FIXNUM);
-	return FIX2INT(val);
+	return FIX2UINT(val);
 }
 
 static void rb_git_indexentry_toC(git_index_entry *entry, VALUE rb_entry)
@@ -286,8 +286,8 @@ static void rb_git_indexentry_toC(git_index_entry *entry, VALUE rb_entry)
 		if (!rb_obj_is_kind_of(val, rb_cTime))
 			rb_raise(rb_eTypeError, ":mtime must be a Time instance");
 
-		entry->mtime.seconds = NUM2INT(rb_funcall(val, rb_intern("to_i"), 0));
-		entry->mtime.nanoseconds = NUM2INT(rb_funcall(val, rb_intern("usec"), 0)) * 1000;
+		entry->mtime.seconds = NUM2UINT(rb_funcall(val, rb_intern("to_i"), 0));
+		entry->mtime.nanoseconds = NUM2UINT(rb_funcall(val, rb_intern("usec"), 0)) * 1000;
 	} else {
 		entry->mtime.seconds = entry->mtime.nanoseconds = 0;
 	}
@@ -296,8 +296,8 @@ static void rb_git_indexentry_toC(git_index_entry *entry, VALUE rb_entry)
 		if (!rb_obj_is_kind_of(val, rb_cTime))
 			rb_raise(rb_eTypeError, ":ctime must be a Time instance");
 
-		entry->ctime.seconds = NUM2INT(rb_funcall(val, rb_intern("to_i"), 0));
-		entry->ctime.nanoseconds = NUM2INT(rb_funcall(val, rb_intern("usec"), 0)) * 1000;
+		entry->ctime.seconds = NUM2UINT(rb_funcall(val, rb_intern("to_i"), 0));
+		entry->ctime.nanoseconds = NUM2UINT(rb_funcall(val, rb_intern("usec"), 0)) * 1000;
 	} else {
 		entry->ctime.seconds = entry->ctime.nanoseconds = 0;
 	}
@@ -307,7 +307,7 @@ static void rb_git_indexentry_toC(git_index_entry *entry, VALUE rb_entry)
 
 	val = rb_hash_aref(rb_entry, CSTR2SYM("stage"));
 	if (!NIL_P(val)) {
-		unsigned int stage = NUM2INT(val);
+		unsigned int stage = NUM2UINT(val);
 		entry->flags &= ~GIT_IDXENTRY_STAGEMASK;
 		entry->flags |= (stage << GIT_IDXENTRY_STAGESHIFT) & GIT_IDXENTRY_STAGEMASK;
 	}

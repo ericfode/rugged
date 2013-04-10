@@ -61,7 +61,8 @@ static int ref_foreach__block(const char *ref_name, void *opaque)
 static VALUE rb_git_ref_each(int argc, VALUE *argv, VALUE self)
 {
 	git_repository *repo;
-	int error, flags = GIT_REF_LISTALL;
+	int error;
+	uint flags = GIT_REF_LISTALL;
 	VALUE rb_repo, rb_list, rb_glob, rb_block;
 
 	rb_scan_args(argc, argv, "12&", &rb_repo, &rb_list, &rb_glob, &rb_block);

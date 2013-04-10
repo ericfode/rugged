@@ -123,8 +123,9 @@ static VALUE rb_git_remote_disconnect(VALUE self)
 
 static VALUE rb_git_remote_connect(VALUE self, VALUE rb_direction)
 {
-	int error, direction = 0;
+	int error;
 	git_remote *remote;
+	git_direction direction;
 	ID id_direction;
 
 	Data_Get_Struct(self, git_remote, remote);

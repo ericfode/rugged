@@ -165,7 +165,7 @@ static VALUE rb_git_walker_sorting(VALUE self, VALUE ruby_sort_mode)
 {
 	git_revwalk *walk;
 	Data_Get_Struct(self, git_revwalk, walk);
-	git_revwalk_sorting(walk, FIX2INT(ruby_sort_mode));
+	git_revwalk_sorting(walk, FIX2UINT(ruby_sort_mode));
 	return Qnil;
 }
 
