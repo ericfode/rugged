@@ -154,6 +154,38 @@ static VALUE rb_git_diff_patch_context(VALUE self)
 	return INT2FIX(context);
 }
 
+static int patch_print_cb(
+	const git_diff_delta *delta,
+	const git_diff_range *range,
+	char line_origin,
+	const char *content,
+	size_t content_len,
+	void *payload)
+{
+	VALUE rb_str = (VALUE)payload;
+
+	rb_str_cat(rb_str, content, content_len);
+
+	return GIT_OK;
+}
+
+/*
+ *  call-seq:
+ *    patch.context -> int
+ *
+ *  Returns the number of context lines in the patch.
+ */
+static VALUE rb_git_diff_patch_to_s(VALUE self)
+{
+	git_diff_patch *patch;
+	VALUE rb_str = rb_str_new(NULL, 0);
+	Data_Get_Struct(self, git_diff_patch, patch);
+
+	git_diff_patch_print(patch, patch_print_cb, (void*)rb_str);
+
+	return rb_str;
+}
+
 void Init_rugged_diff_patch(void)
 {
 	rb_cRuggedDiffPatch = rb_define_class_under(rb_cRuggedDiff, "Patch", rb_cObject);
@@ -163,6 +195,8 @@ void Init_rugged_diff_patch(void)
 	rb_define_method(rb_cRuggedDiffPatch, "deletions", rb_git_diff_patch_deletions, 0);
 
 	rb_define_method(rb_cRuggedDiffPatch, "delta", rb_git_diff_patch_delta, 0);
+
+	rb_define_method(rb_cRuggedDiffPatch, "to_s", rb_git_diff_patch_to_s, 0);
 
 	rb_define_method(rb_cRuggedDiffPatch, "each_hunk", rb_git_diff_patch_each_hunk, 0);
 	rb_define_method(rb_cRuggedDiffPatch, "hunk_count", rb_git_diff_patch_hunk_count, 0);
