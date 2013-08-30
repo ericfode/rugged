@@ -181,7 +181,7 @@ static VALUE rb_git_diff_patch_to_s(VALUE self)
 	VALUE rb_str = rb_str_new(NULL, 0);
 	Data_Get_Struct(self, git_diff_patch, patch);
 
-	git_diff_patch_print(patch, patch_print_cb, (void*)rb_str);
+	rugged_exception_check(git_diff_patch_print(patch, patch_print_cb, (void*)rb_str));
 
 	return rb_str;
 }
