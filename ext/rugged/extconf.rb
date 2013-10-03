@@ -48,8 +48,9 @@ if preserving_globals { dir_config('git2') }.any?
 else
   CWD = File.expand_path(File.dirname(__FILE__))
   LIBGIT2_DIR ||= ENV['LIBGIT2_DIR'] ||= File.join(CWD, '..', '..', 'vendor', 'libgit2')
-
-  if find_executable('cmake')
+  if ENV['LIBGIT2_DIR']
+    dir_config('git2', "#{LIBGIT2_DIR}/include",LIBGIT2_DIR)
+  elsif find_executable('cmake')
     Dir.chdir(LIBGIT2_DIR) do
       Dir.mkdir("build") if !Dir.exists?("build")
 
